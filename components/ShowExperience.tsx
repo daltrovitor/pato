@@ -55,8 +55,8 @@ function playChoir(audioCtx: AudioContext) {
   const frequencies = [261.63, 329.63, 392.00, 523.25]; // C, E, G, C (C Major 7)
   const masterGain = audioCtx.createGain();
   masterGain.gain.setValueAtTime(0, audioCtx.currentTime);
-  masterGain.gain.linearRampToValueAtTime(0.02, audioCtx.currentTime + 1.5);
-  masterGain.gain.setValueAtTime(0.02, audioCtx.currentTime + 10);
+  masterGain.gain.linearRampToValueAtTime(0.035, audioCtx.currentTime + 1.5);
+  masterGain.gain.setValueAtTime(0.035, audioCtx.currentTime + 10);
   masterGain.gain.linearRampToValueAtTime(0, audioCtx.currentTime + 20);
   masterGain.connect(audioCtx.destination);
 
@@ -153,6 +153,7 @@ export default function ShowExperience({ expiresAt }: { expiresAt: string }) {
 
     const drumAudio = new Audio("/drum.mp3");
     const vcGanhouAudio = new Audio("/vcganhooou.mp3");
+    vcGanhouAudio.volume = 0.85;
 
     if (muted) {
       drumAudio.muted = true;
@@ -337,6 +338,13 @@ export default function ShowExperience({ expiresAt }: { expiresAt: string }) {
               <p className="text-gray-300 text-sm sm:text-base leading-relaxed mb-3 font-mono">
                 Para ter a melhor experiência, certifique-se de que o <strong className="text-white">som está ativado</strong> antes de iniciar o show.
               </p>
+
+              <div className="flex items-center gap-3 bg-white/5 border border-white/10 px-4 py-3 mb-4">
+                <span className="text-xl">🎧</span>
+                <p className="text-gray-400 text-xs sm:text-sm leading-snug font-mono text-left">
+                  Use <strong className="text-white">fones de ouvido</strong> ou esteja em um <strong className="text-white">lugar silencioso</strong> para a melhor experiência.
+                </p>
+              </div>
 
               <div className="text-gray-400 text-sm md:text-base uppercase font-bold tracking-widest mb-8 border-2 border-red-500/50 p-4 bg-red-500/10">
                 <span className="block mb-1 text-red-500">VALIDADE: 1 HORA</span>
