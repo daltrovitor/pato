@@ -20,8 +20,7 @@ type ShowPhase =
   | "strobe-lafa"
   | "duck-reveal"
   | "made-by"
-  | "finished"
-  | "expired";
+  | "finished";
 
 // --- AUDIO GENERATORS ---
 function playPuff(audioCtx: AudioContext) {
@@ -101,7 +100,7 @@ function playChoir(audioCtx: AudioContext) {
 
 
 
-export default function ShowExperience({ expiresAt }: { expiresAt: string }) {
+export default function ShowExperience() {
   const [phase, setPhase] = useState<ShowPhase>("loading");
   const [lightingMode, setLightingMode] = useState<"intro" | "pointing" | "off">("off");
   const [showStarted, setShowStarted] = useState(false);
@@ -110,24 +109,7 @@ export default function ShowExperience({ expiresAt }: { expiresAt: string }) {
   const audioCtxRef = useRef<AudioContext | null>(null);
   const stopDrumRef = useRef<(() => void) | null>(null);
 
-  // Remaining time display
-  const [timeLeft, setTimeLeft] = useState("");
-  useEffect(() => {
-    const updateTime = () => {
-      const diff = new Date(expiresAt).getTime() - Date.now();
-      if (diff <= 0) {
-        setTimeLeft("Expirado");
-        setPhase("expired");
-        return;
-      }
-      const min = Math.floor(diff / 60000);
-      const sec = Math.floor((diff % 60000) / 1000);
-      setTimeLeft(`${min}:${sec.toString().padStart(2, "0")}`);
-    };
-    updateTime();
-    const interval = setInterval(updateTime, 1000);
-    return () => clearInterval(interval);
-  }, [expiresAt]);
+
 
   const handleDuckLoaded = useCallback(() => {
     if (phase === "loading") {
@@ -253,10 +235,6 @@ export default function ShowExperience({ expiresAt }: { expiresAt: string }) {
   }, []);
 
   const resetShow = useCallback(() => {
-    if (new Date(expiresAt) < new Date()) {
-      setPhase("expired");
-      return;
-    }
     if (stopDrumRef.current) stopDrumRef.current();
     if (audioCtxRef.current) {
       audioCtxRef.current.close();
@@ -265,7 +243,7 @@ export default function ShowExperience({ expiresAt }: { expiresAt: string }) {
     setPhase("warning");
     setShowStarted(false);
     setShowLafaText(false);
-  }, [expiresAt]);
+  }, []);
 
 
 
@@ -346,10 +324,7 @@ export default function ShowExperience({ expiresAt }: { expiresAt: string }) {
                 </p>
               </div>
 
-              <div className="text-gray-400 text-sm md:text-base uppercase font-bold tracking-widest mb-8 border-2 border-red-500/50 p-4 bg-red-500/10">
-                <span className="block mb-1 text-red-500">VALIDADE: 1 HORA</span>
-                <span className="block text-white">RESTANDO: {timeLeft}</span>
-              </div>
+
 
               <button
                 onClick={() => setMuted(!muted)}
@@ -506,53 +481,7 @@ export default function ShowExperience({ expiresAt }: { expiresAt: string }) {
           </motion.div>
         )}
 
-        {/* EXPIRED SCREEN */}
-        {phase === "expired" && (
-          <motion.div
-            key="expired"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="absolute inset-0 bg-black flex flex-col items-center justify-center p-6 text-center"
-          >
-            <motion.div
-              initial={{ scale: 0.8, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              className="max-w-md border-2 border-red-500/30 p-8 bg-red-500/5 relative overflow-hidden"
-            >
-              {/* Decorative background stripes */}
-              <div className="absolute inset-0 opacity-10 pointer-events-none"
-                style={{ backgroundImage: 'repeating-linear-gradient(45deg, #ef4444 0, #ef4444 2px, transparent 0, transparent 50%)', backgroundSize: '15px 15px' }}>
-              </div>
 
-              <div className="w-20 h-20 mx-auto mb-6 bg-red-500/20 flex items-center justify-center border-2 border-red-500">
-                <span className="text-4xl">⌛</span>
-              </div>
-
-              <h2 className="text-3xl font-black text-red-500 mb-2 uppercase tracking-tighter">
-                ACESSO EXPIRADO
-              </h2>
-
-              <div className="h-px w-full bg-red-500/30 mb-6" />
-
-              <p className="text-gray-300 text-sm leading-relaxed mb-8 font-mono">
-                Sua sessão de visualização chegou ao fim. Por motivos de segurança, esta senha não é mais válida.
-              </p>
-
-              <div className="space-y-4 relative z-10">
-                <p className="text-xs text-gray-500 uppercase font-bold tracking-widest">
-                  O QUE FAZER AGORA?
-                </p>
-                <button
-                  onClick={() => window.location.href = '/'}
-                  className="block w-full py-4 border border-white/20 text-white font-bold uppercase tracking-widest text-xs hover:bg-white/5 transition-colors"
-                >
-                  VOLTAR AO INÍCIO
-                </button>
-              </div>
-            </motion.div>
-          </motion.div>
-        )}
       </AnimatePresence>
 
       {/* DO LAFA — fica cravado na tela enquanto o áudio continua */}

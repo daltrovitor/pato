@@ -10,9 +10,7 @@ export default function HomePage() {
   const [code, setCode] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [isPending, startTransition] = useTransition();
-  const [showData, setShowData] = useState<{ active: boolean; expiresAt?: string }>({
-    active: false,
-  });
+  const [showActive, setShowActive] = useState(false);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -25,8 +23,8 @@ export default function HomePage() {
       setError(null);
       try {
         const result = await validatePassword(code);
-        if (result.valid && result.expiresAt) {
-          setShowData({ active: true, expiresAt: result.expiresAt });
+        if (result.valid) {
+          setShowActive(true);
         } else {
           setError(result.message);
         }
@@ -42,8 +40,8 @@ export default function HomePage() {
     if (error) setError(null);
   };
 
-  if (showData.active && showData.expiresAt) {
-    return <ShowExperience expiresAt={showData.expiresAt} />;
+  if (showActive) {
+    return <ShowExperience />;
   }
 
   return (
@@ -132,11 +130,7 @@ export default function HomePage() {
             </motion.button>
           </form>
 
-          <div className="mt-8 pt-6 border-t border-border/50 text-center">
-             <p className="text-xs text-muted/60 font-medium">
-               A senha expira em 1 hora após a ativação original.
-             </p>
-          </div>
+
         </div>
       </motion.div>
     </main>

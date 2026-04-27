@@ -91,43 +91,15 @@ export async function validatePassword(code: string) {
   }
 
   if (!password.foi_ativada) {
-    const now = new Date();
-    const expiration = new Date(now.getTime() + 60 * 60 * 1000); // 1 hour
-
     const { error: updateError } = await supabase
       .from("passwords")
-      .update({
-        foi_ativada: true,
-        data_expiracao: expiration.toISOString(),
-      })
+      .update({ foi_ativada: true })
       .eq("id", password.id);
-      
+
     if (updateError) {
       return { valid: false, message: "Erro ao ativar a senha no banco de dados." };
     }
-
-    return {
-      valid: true,
-      message: "Senha ativada com sucesso!",
-      expiresAt: expiration.toISOString(),
-    };
   }
 
-  if (password.data_expiracao) {
-    const expDate = new Date(password.data_expiracao);
-    if (new Date() > expDate) {
-      return {
-        valid: false,
-        message: "Senha expirada. O prazo de 1 hora foi ultrapassado.",
-      };
-    }
-
-    return {
-      valid: true,
-      message: "Senha válida!",
-      expiresAt: new Date(password.data_expiracao).toISOString(),
-    };
-  }
-
-  return { valid: false, message: "Erro interno ao validar senha." };
+  return { valid: true, message: "Senha válida!" };
 }
